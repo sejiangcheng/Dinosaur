@@ -1,4 +1,7 @@
 import { combineReducers } from "redux";
+import role from "./role";
+import customer from "./customer";
+import user from "./user";
 
 export const initialState = {
   data: {}
@@ -9,5 +12,8 @@ function main(state = initialState, action) {
 }
 
 export default combineReducers({
-  main
+  main,
+  role,
+  customer,
+  user
 });

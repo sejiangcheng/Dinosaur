@@ -33,6 +33,7 @@ const config = {
   },
   externals: [
     /^@microapp\/(\w|\/)*$/,
+    /^@se\/(\w|\/)*$/,
     /^antd$/,
     /^axios$/,
     /^lodash$/,
@@ -41,6 +42,7 @@ const config = {
     /^react-dom$/,
     /^react-dom\/server$/,
     /^react-router$/,
+    /^react-redux$/,
     /^react\/lib.*/
   ],
   resolve: {
@@ -167,7 +169,10 @@ const config = {
     hot: true,
     publicPath: publicPath,
     contentBase: outputPath,
-    headers: { "Access-Control-Allow-Origin": "*" },
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:8080",
+      "Access-Control-Allow-Credentials": true
+    },
     overlay: {
       warning: true,
       errors: true

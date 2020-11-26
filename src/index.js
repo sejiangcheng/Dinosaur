@@ -1,5 +1,5 @@
 import { setPublicPath } from "systemjs-webpack-interop";
-setPublicPath("@microapp/dinosaur");
-
-import React from "react";
-export default React.lazy(() => import("./module"));
+import "@/mock";
+setPublicPath("@se/module/dinosaur");
+import Module from "./module";
+export default Module;

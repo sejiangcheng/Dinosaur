@@ -48,7 +48,6 @@ function UploadImage(props) {
   };
 
   const onUpload = uploadInfo => {
-    console.log("onupload");
     const { file, onSuccess, onError } = uploadInfo;
     return getBase64(file, async imgContent => {
       try {
@@ -80,6 +79,7 @@ function UploadImage(props) {
     ) : (
       <div>
         <Icon type={"plus"} />
+        <div>上传</div>
       </div>
     );
   };

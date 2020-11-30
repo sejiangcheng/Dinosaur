@@ -2,6 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 0;
 }
 .table-wrapper {
   .flex-full-height();
@@ -13,15 +14,27 @@
         .flex-full-height();
         justify-content: space-between;
         .ant-table {
-          height: 680px;
+          .flex-full-height();
           overflow-y: auto;
           overflow-x: hidden;
+          .ant-table-content {
+            .flex-full-height();
+            .ant-table-tbody {
+              tr {
+                min-height: 46px;
+              }
+            }
+            .ant-table-placeholder {
+              .flex-full-height();
+              justify-content: center;
+              align-items: center;
+            }
+          }
         }
         ul {
           display: flex;
           justify-content: flex-end;
           align-items: flex-end;
-          flex: 1;
         }
       }
     }

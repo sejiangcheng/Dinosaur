@@ -18,7 +18,7 @@ export default function CustomerEditForm(props) {
     <>
       <InputFormItem
         form={form}
-        label="姓名"
+        label="客户名称"
         code="CustomerName"
         item={currentEditedCustomer}
         onChange={changeCustomerAttr}
@@ -27,7 +27,10 @@ export default function CustomerEditForm(props) {
       <Form.Item
         label={
           <span>
-            Logo<span className="weak-title">（选填）</span>
+            LOGO
+            <span className="weak-title">
+              （选填。只支持.jpg .jpeg .png .bmp格式）
+            </span>
           </span>
         }
       >
@@ -37,7 +40,6 @@ export default function CustomerEditForm(props) {
           item={currentEditedCustomer}
           onChange={changeCustomerAttr}
         />
-        <div className="weak-title">只支持.jpg .jpeg .png .bmp格式</div>
       </Form.Item>
       <InputFormItem
         form={form}

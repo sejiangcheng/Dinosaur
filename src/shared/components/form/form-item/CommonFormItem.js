@@ -26,7 +26,7 @@ export default function CommonFormItem(props) {
         validateTrigger: ["onChange", "onBlur"],
         validateFirst: true,
         rules,
-        initialValue: item[code] || ""
+        initialValue: item[code]
       })(props.component)}
     </Form.Item>
   );

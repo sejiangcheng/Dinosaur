@@ -1,3 +1,67 @@
-.add-role-button {
-  margin-right: 10px;
+.flex-full-height {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 0;
+}
+.role-edit-drawer {
+  .ant-drawer-content-wrapper {
+    width: 900px !important;
+    .flex-full-height();
+    > .ant-drawer-content {
+      .flex-full-height();
+      > .ant-drawer-wrapper-body {
+        .flex-full-height();
+        > .ant-drawer-body {
+          .flex-full-height();
+          > .ant-form {
+            .flex-full-height();
+            > .drawer-form-items {
+              flex: 1;
+            }
+          }
+          .role-edit-drawer-content {
+            .flex-full-height();
+            .permission-selection-wrapper {
+              .flex-full-height();
+              .role-permission-edit-tabs {
+                display: flex;
+                flex: 1;
+                .ant-tabs-content {
+                  .flex-full-height();
+                  .ant-tabs-tabpane-active {
+                    .flex-full-height();
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.role-permission-edit-tabs {
+  .ant-tabs-bar {
+    .ant-tabs-tab {
+      width: 255px;
+      height: 40px;
+      margin: 4px 0 !important;
+      padding: 10px 15px 10px 12px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center;
+      &-active {
+        background: #f0fff0;
+      }
+    }
+  }
+  .permission-action-select {
+    height: 46px;
+    padding: 12px 40px 12px 8px;
+    display: flex;
+    justify-content: space-between;
+  }
 }

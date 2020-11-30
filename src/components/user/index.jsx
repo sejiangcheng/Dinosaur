@@ -2,22 +2,22 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUsersByPageNumber } from "@/actions/user";
 import {
-  createUser,
   saveNewUser,
-  saveEditedUser,
   deleteUser,
-  saveSuccessMessageShowed,
-  changeUserStatus
+  changeUserStatus,
+  saveEditedUserBasicInfo,
+  saveEditedUserDataPermission
 } from "@/actions/user/edit";
 import {
   Divider,
   Drawer,
-  Button,
-  Form,
   Modal,
   Icon,
+  Spin,
+  Radio,
   Menu,
-  Dropdown
+  Dropdown,
+  message
 } from "antd";
 import _ from "lodash";
 import { withRouter } from "react-router";
@@ -25,6 +25,8 @@ import { formStatus } from "@/constants/formStatus";
 import PlatformPage from "../platformPage";
 import UserDrawerContent from "./UserDrawerContent";
 import "./style.less";
+import { sendEmail, sendMessage } from "@/actions/user/index";
+import { getRoles } from "@/actions/role";
 const getMenu = (
   user,
   onEditBasicInfo,
@@ -62,38 +64,46 @@ const getColumns = (
   onEditDataPermission,
   onResetPasswordByEmail,
   onResetPasswordByMessage,
-  onDelete
+  onDelete,
+  renderFilterRolesDropdown
 ) => {
   return [
     {
       title: "用户名",
       dataIndex: "Name",
-      key: "Name"
+      key: "Name",
+      width: "16%"
     },
     {
       title: "角色",
       dataIndex: "UserTypeName",
-      key: "UserTypeName"
+      key: "UserTypeName",
+      filterDropdown: renderFilterRolesDropdown(),
+      width: "15%"
     },
     {
       title: "邮箱",
       dataIndex: "Email",
-      key: "Email"
+      key: "Email",
+      width: "18%"
     },
     {
       title: "手机",
       dataIndex: "Telephone",
-      key: "Telephone"
+      key: "Telephone",
+      width: "13%"
     },
     {
       title: "备注",
       dataIndex: "Description",
-      key: "Description"
+      key: "Description",
+      width: "27%"
     },
     {
       title: "操作",
       dataIndex: "Operations",
       key: "Operations",
+      width: "11%",
       render: (text, record, index) => {
         return (
           <div className="flex-start-layout">
@@ -137,9 +147,39 @@ function User(props) {
     status,
     loading,
     currentEditedUser,
+    currentEditedDataPermission,
+    currentUserHasAllDataPermission,
     needRefresh,
     showSaveSuccessMessage
   } = useSelector(state => state.platform.user);
+  const user = useSelector(state => state.main.currentUser);
+  const loadingRole = useSelector(state => state.platform.role.loading);
+  const roles = useSelector(state => state.platform.role.roles);
+  const [columns, setColumns] = useState([]);
+  const [multipleDrawer, setMultipleDrawer] = useState(false);
+  const [filterParams, setFilterParams] = useState({});
+  useEffect(() => {
+    if (!roles) {
+      const { CustomerId } = user;
+      //只有用户为客户视角时才有customerId
+      dispatch(getRoles(CustomerId));
+    } else {
+      const columns = getColumns(
+        onViewDataPermission,
+        onEditBasicInfo,
+        onEditDataPermission,
+        onResetPasswordByEmail,
+        onResetPasswordByMessage,
+        onDelete,
+        renderFilterRolesDropdown
+      );
+      setColumns(columns);
+    }
+  }, [roles, filterParams]);
+
+  const resetFilter = () => {
+    setFilterParams({ roleId: null });
+  };
   const onViewDataPermission = user => {
     dispatch(changeUserStatus(formStatus.VIEW_DATA_PERMISSION, user));
   };
@@ -152,10 +192,18 @@ function User(props) {
   const onClose = () => {
     dispatch(changeUserStatus(formStatus.VIEW, null));
   };
-  const onResetPasswordByEmail = user => {};
-  const onResetPasswordByMessage = user => {};
+  const onResetPasswordByEmail = user => {
+    sendEmail(user.Id).then(() => {
+      message.success("发送成功，重置密码的链接在24小时内有效，请及时通知用户");
+    });
+  };
+  const onResetPasswordByMessage = user => {
+    sendMessage(user.Id).then(() => {
+      message.success("发送成功，重置密码的链接在24小时内有效，请及时通知用户");
+    });
+  };
   const onCreateUser = () => {
-    dispatch(createUser());
+    dispatch(changeUserStatus(formStatus.ADD));
   };
   const onDelete = user => {
     Modal.confirm({
@@ -171,35 +219,28 @@ function User(props) {
   };
   const onSave = () => {
     if (status === formStatus.ADD) {
-      dispatch(saveNewUser());
-    } else {
-      dispatch(saveEditedUser(currentEditedUser));
+      dispatch(
+        saveNewUser({
+          currentEditedUser,
+          currentEditedDataPermission,
+          currentUserHasAllDataPermission
+        })
+      );
+    } else if (status === formStatus.EDIT_BASIC_INFO) {
+      dispatch(saveEditedUserBasicInfo(currentEditedUser));
+    } else if (status === formStatus.EDIT_DATA_PERMISSION) {
+      dispatch(
+        saveEditedUserDataPermission({
+          UserId: currentEditedUser.Id,
+          Version: currentEditedUser.Version,
+          WholeSystem: currentUserHasAllDataPermission,
+          Privileges: currentEditedDataPermission
+          // PrivilegeType:0？
+        })
+      );
     }
   };
 
-  const params = {
-    store: {
-      list: users,
-      loading,
-      status,
-      needRefresh,
-      showSaveSuccessMessage
-    },
-    platformType: "用户",
-    getListByPageNumber: getUsersByPageNumber,
-    saveSuccessMessageShowed,
-    searchName: "Name",
-    searchPlaceholder: "请搜索用户名称",
-    columns: getColumns(
-      onViewDataPermission,
-      onEditBasicInfo,
-      onEditDataPermission,
-      onResetPasswordByEmail,
-      onResetPasswordByMessage,
-      onDelete
-    ),
-    onAddNewMember: onCreateUser
-  };
   const getDrawerTitle = () => {
     if (status === formStatus.VIEW_DATA_PERMISSION) {
       return <div>查看数据权限-{currentEditedUser.Name}</div>;
@@ -211,12 +252,58 @@ function User(props) {
       return <div>新建用户</div>;
     }
   };
+  const renderFilterRolesDropdown = () => {
+    return (
+      <div className="table-filter-group">
+        <Radio.Group
+          onChange={e => {
+            setFilterParams({ roleId: e.target.value });
+          }}
+          value={filterParams && filterParams.roleId}
+        >
+          {roles.map(role => {
+            return (
+              <Radio value={role.Id} key={role.Id}>
+                <span className="role-check-value">{role.Name}</span>
+              </Radio>
+            );
+          })}
+        </Radio.Group>
+        <div className="table-filter-group-footer">
+          <span onClick={resetFilter}>重置</span>
+        </div>
+      </div>
+    );
+  };
+  const params = {
+    store: {
+      list: users,
+      loading: loading,
+      status,
+      needRefresh,
+      showSaveSuccessMessage
+    },
+    platformType: "用户",
+    getListByPageNumber: getUsersByPageNumber,
+    searchName: "Name",
+    searchPlaceholder: "请搜索用户名称",
+    onAddNewMember: onCreateUser
+  };
+  if (loadingRole) {
+    return (
+      <div className="flex-center-wrapper-layout">
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <>
-      <PlatformPage {...params} />
+      <PlatformPage {...params} columns={columns} filterParams={filterParams} />
       {status !== formStatus.VIEW && (
         <Drawer
-          className="platform-edit-drawer"
+          className={
+            "platform-edit-drawer" + (multipleDrawer ? " multiple-drawer" : "")
+          }
           closable
           destroyOnClose={true}
           placement="right"
@@ -224,7 +311,13 @@ function User(props) {
           visible={true}
           title={getDrawerTitle()}
         >
-          <UserDrawerContent onClose={onClose} onSave={onSave} />
+          <UserDrawerContent
+            onClose={onClose}
+            onSave={onSave}
+            onChildDrawerVisibleChange={visible => {
+              setMultipleDrawer(visible);
+            }}
+          />
         </Drawer>
       )}
     </>

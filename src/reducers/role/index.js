@@ -5,11 +5,16 @@ import { formStatus } from "@/constants/formStatus";
 
 const initialState = {
   roles: null,
-  currentRole: null,
   currentEditedRole: null,
+  currentRolePrivileges: null,
+  currentAvailablePrivileges: null,
+  currentPartnerId: null, //get currentAvailablePrivileges when partnerId is changed
   error: null,
   loading: false,
-  status: formStatus.VIEW
+  status: formStatus.VIEW,
+  loadingPrivilege: false,
+  loadingAvailablePrivileges: false,
+  needRefresh: true
 };
 
 export default (state = initialState, action) => {
@@ -31,38 +36,85 @@ export default (state = initialState, action) => {
           return !role.CustomerId;
         }
       });
-      return { ...state, roles, loading: false };
+      return { ...state, roles, loading: false, needRefresh: false };
     }
     case actionType.GET_ROLES_FAILURE: {
       return { ...state, roles: null, loading: false };
     }
-    case editAction.CREATE_NEW_ROLE_REQUEST: {
+    case actionType.GET_ROLE_PRIVILEGES_REQUEST: {
+      return {
+        ...state,
+        currentRolePrivileges: null,
+        loading: false,
+        loadingPrivilege: true
+      };
+    }
+    case actionType.GET_ROLE_PRIVILEGES_SUCCESS: {
+      return {
+        ...state,
+        currentRolePrivileges: payload,
+        loading: false,
+        loadingPrivilege: false
+      };
+    }
+    case actionType.GET_ROLE_PRIVILEGES_FAILURE: {
+      return { ...state, loadingPrivilege: false };
+    }
+
+    case actionType.GET_AVAILABLE_PRIVILEGES_REQUEST: {
+      return {
+        ...state,
+        currentAvailablePrivileges: null,
+        loadingAvailablePrivileges: true
+      };
+    }
+    case actionType.GET_AVAILABLE_PRIVILEGES_SUCCESS: {
+      const { partnerId } = payload;
+      return {
+        ...state,
+        currentAvailablePrivileges: payload,
+        loadingAvailablePrivileges: false,
+        currentPartnerId: partnerId
+      };
+    }
+    case actionType.GET_AVAILABLE_PRIVILEGES_FAILURE: {
+      return { ...state, loadingAvailablePrivileges: false };
+    }
+
+    case editAction.SAVE_NEW_ROLE_REQUEST: {
       return { ...state, loading: true };
     }
-    case editAction.CREATE_NEW_ROLE_SUCCESS: {
+    case editAction.SAVE_NEW_ROLE_SUCCESS: {
       return {
         ...state,
         currentEditedRole: null,
         loading: true, // the roles list will be refreshed, the loading status will be set false when roles list is reloaded
-        status: formStatus.VIEW
+        status: formStatus.VIEW,
+        needRefresh: true,
+        currentAvailablePrivileges: null,
+        currentRolePrivileges: null
       };
     }
-    case editAction.CREATE_NEW_ROLE_FAILURE: {
+    case editAction.SAVE_NEW_ROLE_FAILURE: {
       return { ...state, loading: false, status: formStatus.EDIT };
     }
-    case editAction.UPDATE_ROLE_REQUEST: {
+
+    case editAction.SAVE_UPDATED_ROLE_REQUEST: {
       return { ...state, loading: true };
     }
-    case editAction.UPDATE_ROLE_SUCCESS: {
+    case editAction.SAVE_UPDATED_ROLE_SUCCESS: {
       return {
         ...state,
         currentEditedRole: null,
-        loading: true,
-        status: formStatus.VIEW
+        loading: false,
+        status: formStatus.VIEW,
+        needRefresh: true,
+        currentAvailablePrivileges: null,
+        currentRolePrivileges: null
       };
     }
-    case editAction.UPDATE_ROLE_FAILURE: {
-      return { ...state, loading: false, status: formStatus.EDIT };
+    case editAction.SAVE_UPDATED_ROLE_FAILURE: {
+      return { ...state, loading: false };
     }
 
     case editAction.DELETE_ROLE_REQUEST: {
@@ -70,23 +122,31 @@ export default (state = initialState, action) => {
     }
 
     case editAction.DELETE_ROLE_SUCCESS: {
-      return { ...state, loading: true };
+      return {
+        ...state,
+        loading: false,
+        needRefresh: true,
+        currentAvailablePrivileges: null,
+        currentRolePrivileges: null
+      };
     }
 
     case editAction.DELETE_ROLE_FAILURE: {
       return { ...state, loading: false };
     }
-
-    case actionType.EDIT_ROLE: {
-      const role = payload;
+    case editAction.CHANGE_CURRENT_EDITED_ROLE: {
       return {
         ...state,
-        currentEditedRole: _.cloneDeep(role),
-        status: formStatus.EDIT
+        currentEditedRole: { ...payload }
       };
     }
-    case editAction.SAVE_EDITED_ROLE: {
-      return { ...state, currentEditedRole: null, status: formStatus.VIEW };
+    case editAction.CHANGE_ROLE_STATUS: {
+      const { status, currentEditedRole } = payload;
+      return {
+        ...state,
+        status,
+        currentEditedRole: currentEditedRole || {}
+      };
     }
     default:
       return state;

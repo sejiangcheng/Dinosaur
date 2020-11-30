@@ -16,7 +16,6 @@ const initialState = {
   loadingDataPermission: false,
   status: formStatus.VIEW,
   needRefresh: true,
-  showSaveSuccessMessage: false,
   hierarchyMap: {}
 };
 
@@ -62,9 +61,6 @@ export default (state = initialState, action) => {
         currentUserHasAllDataPermission: false
       };
     }
-    case editAction.CREATE_USER: {
-      return { ...state, currentEditedUser: {}, status: formStatus.ADD };
-    }
     case editAction.CREATE_NEW_USER_REQUEST: {
       return { ...state, loading: true };
     }
@@ -73,25 +69,48 @@ export default (state = initialState, action) => {
         ...state,
         currentEditedUser: null,
         loading: true, // the user list will be refreshed, the loading status will be set false when user list is reloaded
-        status: formStatus.VIEW
+        status: formStatus.VIEW,
+        needRefresh: true
       };
     }
     case editAction.CREATE_NEW_USER_FAILURE: {
-      return { ...state, loading: false, status: formStatus.EDIT };
+      return { ...state, loading: false };
     }
-    case editAction.UPDATE_USER_REQUEST: {
+    case editAction.UPDATE_USER_BASIC_INFO_REQUEST: {
       return { ...state, loading: true };
     }
-    case editAction.UPDATE_USER_SUCCESS: {
+    case editAction.UPDATE_USER_BASIC_INFO_SUCCESS: {
       return {
         ...state,
         currentEditedUser: null,
-        loading: true,
+        currentUserDataPermission: null,
+        currentEditedDataPermission: null,
+        currentUserHasAllDataPermission: false,
+        loading: false,
+        status: formStatus.VIEW,
+        needRefresh: true
+      };
+    }
+    case editAction.UPDATE_USER_BASIC_INFO_FAILURE: {
+      return { ...state, loading: false };
+    }
+
+    case editAction.UPDATE_USER_DATA_PERMISSION_REQUEST: {
+      return { ...state, loading: true };
+    }
+    case editAction.UPDATE_USER_DATA_PERMISSION_SUCCESS: {
+      return {
+        ...state,
+        currentEditedUser: null,
+        currentUserDataPermission: null,
+        currentEditedDataPermission: null,
+        currentUserHasAllDataPermission: false,
+        loading: false,
         status: formStatus.VIEW
       };
     }
-    case editAction.UPDATE_USER_FAILURE: {
-      return { ...state, loading: false, status: formStatus.EDIT };
+    case editAction.UPDATE_USER_DATA_PERMISSION_FAILURE: {
+      return { ...state, loading: false };
     }
 
     case editAction.DELETE_USER_REQUEST: {
@@ -106,23 +125,15 @@ export default (state = initialState, action) => {
       return { ...state, loading: false };
     }
 
-    case actionType.EDIT_USER: {
-      const user = payload;
-      return {
-        ...state,
-        currentEditedUser: _.cloneDeep(user),
-        status: formStatus.EDIT
-      };
-    }
-    case editAction.SAVE_EDITED_USER: {
-      return { ...state, currentEditedUser: null, status: formStatus.VIEW };
-    }
     case editAction.CHANGE_USER_STATUS: {
       const { status, user: currentEditedUser } = payload;
       return {
         ...state,
         status,
-        currentEditedUser
+        currentEditedUser: currentEditedUser || {},
+        currentUserDataPermission: null,
+        currentEditedDataPermission: null,
+        currentUserHasAllDataPermission: false
       };
     }
     case editAction.CHANGE_CURRENT_EDITED_USER: {
@@ -131,6 +142,13 @@ export default (state = initialState, action) => {
         currentEditedUser: { ...payload }
       };
     }
+    case editAction.SET_DATA_PERMISSION: {
+      return {
+        ...state,
+        currentEditedDataPermission: payload
+      };
+    }
+
     default:
       return state;
   }

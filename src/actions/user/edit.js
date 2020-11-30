@@ -1,4 +1,5 @@
 import { service } from "@se/pop";
+import * as actionType from "@/actions/main";
 
 export const CREATE_NEW_USER_REQUEST = "platform/user/CREATE_NEW_USER_REQUEST";
 export const CREATE_NEW_USER_SUCCESS = "platform/user/CREATE_NEW_USER_SUCCESS";
@@ -12,6 +13,9 @@ export function saveNewUser(params) {
       });
       const url = "/user/create";
       const res = await service({ url, method: "post", data: params });
+      dispatch({
+        type: actionType.DISPLAY_SAVE_SUCESS_MESSAGE
+      });
       return dispatch({
         type: CREATE_NEW_USER_SUCCESS,
         payload: res
@@ -25,25 +29,62 @@ export function saveNewUser(params) {
   };
 }
 
-export const UPDATE_USER_REQUEST = "platform/user/UPDATE_USER_REQUEST";
-export const UPDATE_USER_SUCCESS = "platform/user/UPDATE_USER_SUCCESS";
-export const UPDATE_USER_FAILURE = "platform/user/UPDATE_USER_FAILURE";
+export const UPDATE_USER_BASIC_INFO_REQUEST =
+  "platform/user/UPDATE_USER_BASIC_INFO_REQUEST";
+export const UPDATE_USER_BASIC_INFO_SUCCESS =
+  "platform/user/UPDATE_USER_BASIC_INFO_SUCCESS";
+export const UPDATE_USER_BASIC_INFO_FAILURE =
+  "platform/user/UPDATE_USER_BASIC_INFO_FAILURE";
 
-export function saveEditedUser(params) {
+export function saveEditedUserBasicInfo(params) {
   return async dispatch => {
     try {
       dispatch({
-        type: UPDATE_USER_REQUEST
+        type: UPDATE_USER_BASIC_INFO_REQUEST
       });
       const url = "/user/update";
       const res = await service({ url, method: "post", data: params });
+      dispatch({
+        type: actionType.DISPLAY_SAVE_SUCESS_MESSAGE
+      });
       return dispatch({
-        type: UPDATE_USER_SUCCESS,
+        type: UPDATE_USER_BASIC_INFO_SUCCESS,
         payload: res
       });
     } catch (error) {
       return dispatch({
-        type: UPDATE_USER_FAILURE,
+        type: UPDATE_USER_BASIC_INFO_FAILURE,
+        payload: error
+      });
+    }
+  };
+}
+
+export const UPDATE_USER_DATA_PERMISSION_REQUEST =
+  "platform/user/UPDATE_USER_DATA_PERMISSION_REQUEST";
+export const UPDATE_USER_DATA_PERMISSION_SUCCESS =
+  "platform/user/UPDATE_USER_DATA_PERMISSION_SUCCESS";
+export const UPDATE_USER_DATA_PERMISSION_FAILURE =
+  "platform/user/UPDATE_USER_DATA_PERMISSION_FAILURE";
+
+export function saveEditedUserDataPermission(params) {
+  return async dispatch => {
+    try {
+      dispatch({
+        type: UPDATE_USER_DATA_PERMISSION_REQUEST
+      });
+      const url = `/user/${params.UserId}/usercustomer/save`;
+      const res = await service({ url, method: "post", data: params });
+      dispatch({
+        type: actionType.DISPLAY_SAVE_SUCESS_MESSAGE
+      });
+      return dispatch({
+        type: UPDATE_USER_DATA_PERMISSION_SUCCESS,
+        payload: res
+      });
+    } catch (error) {
+      return dispatch({
+        type: UPDATE_USER_DATA_PERMISSION_FAILURE,
         payload: error
       });
     }
@@ -75,18 +116,6 @@ export function deleteUser(params) {
   };
 }
 
-export const SAVE_EDITED_USER = "platform/user/SAVE_EDITED_USER";
-
-export const EDIT_USER = "platform/user/EDIT_USER";
-export function editUser(user) {
-  return { type: EDIT_USER, payload: user };
-}
-
-export const CREATE_USER = "platform/user/CREATE_USER";
-export function createUser() {
-  return { type: CREATE_USER };
-}
-
 export const CLOSE_EDIT_STATUS = "platform/user/CLOSE_EDIT_STATUS";
 export function closeEditStatus() {
   return { type: CLOSE_EDIT_STATUS };
@@ -98,14 +127,6 @@ export function changeCurrentEditedUser(currentEditedUser) {
   return {
     type: CHANGE_CURRENT_EDITED_USER,
     payload: currentEditedUser
-  };
-}
-
-export const SAVE_SUCCESS_MESSAGE_SHOWED =
-  "platform/user/SAVE_SUCCESS_MESSAGE_SHOWED";
-export function saveSuccessMessageShowed() {
-  return {
-    type: SAVE_SUCCESS_MESSAGE_SHOWED
   };
 }
 

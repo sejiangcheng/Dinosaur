@@ -1,4 +1,5 @@
 import { service } from "@se/pop";
+import * as actionType from "@/actions/main";
 
 export const CREATE_NEW_CUSTOMER_REQUEST =
   "platform/customer/CREATE_NEW_CUSTOMER_REQUEST";
@@ -15,6 +16,9 @@ export function saveNewCustomer(params) {
       });
       const url = "/customer/create";
       const res = await service({ url, method: "post", data: params });
+      dispatch({
+        type: actionType.DISPLAY_SAVE_SUCESS_MESSAGE
+      });
       return dispatch({
         type: CREATE_NEW_CUSTOMER_SUCCESS,
         payload: res
@@ -43,6 +47,9 @@ export function saveEditedCustomer(params) {
       });
       const url = "/customer/update";
       const res = await service({ url, method: "post", data: params });
+      dispatch({
+        type: actionType.DISPLAY_SAVE_SUCESS_MESSAGE
+      });
       return dispatch({
         type: UPDATE_CUSTOMER_SUCCESS,
         payload: res
@@ -106,13 +113,5 @@ export function changeCurrentEditedCustomer(currentEditedCustomer) {
   return {
     type: CHANGE_CURRENT_EDITED_CUSTOMER,
     payload: currentEditedCustomer
-  };
-}
-
-export const SAVE_SUCCESS_MESSAGE_SHOWED =
-  "platform/customer/SAVE_SUCCESS_MESSAGE_SHOWED";
-export function saveSuccessMessageShowed() {
-  return {
-    type: SAVE_SUCCESS_MESSAGE_SHOWED
   };
 }

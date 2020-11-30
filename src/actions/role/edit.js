@@ -1,49 +1,52 @@
 import { service } from "@se/pop";
 
-export const CREATE_NEW_ROLE_REQUEST = "platform/role/CREATE_NEW_ROLE_REQUEST";
-export const CREATE_NEW_ROLE_SUCCESS = "platform/role/CREATE_NEW_ROLE_SUCCESS";
-export const CREATE_NEW_ROLE_FAILURE = "platform/role/CREATE_NEW_ROLE_FAILURE";
+export const SAVE_NEW_ROLE_REQUEST = "platform/role/CREATE_NEW_ROLE_REQUEST";
+export const SAVE_NEW_ROLE_SUCCESS = "platform/role/CREATE_NEW_ROLE_SUCCESS";
+export const SAVE_NEW_ROLE_FAILURE = "platform/role/CREATE_NEW_ROLE_FAILURE";
 
-export function createNewRole(params) {
+export function saveNewRole(params) {
   return async dispatch => {
     try {
       dispatch({
-        type: CREATE_NEW_ROLE_REQUEST
+        type: SAVE_NEW_ROLE_REQUEST
       });
       const url = "/role/create";
       const res = await service({ url, method: "post", data: params });
       return dispatch({
-        type: CREATE_NEW_ROLE_SUCCESS,
+        type: SAVE_NEW_ROLE_SUCCESS,
         payload: res
       });
     } catch (error) {
       return dispatch({
-        type: CREATE_NEW_ROLE_FAILURE,
+        type: SAVE_NEW_ROLE_FAILURE,
         payload: error
       });
     }
   };
 }
 
-export const UPDATE_ROLE_REQUEST = "platform/role/UPDATE_ROLE_REQUEST";
-export const UPDATE_ROLE_SUCCESS = "platform/role/UPDATE_ROLE_SUCCESS";
-export const UPDATE_ROLE_FAILURE = "platform/role/UPDATE_ROLE_FAILURE";
+export const SAVE_UPDATED_ROLE_REQUEST =
+  "platform/role/SAVE_UPDATED_ROLE_REQUEST";
+export const SAVE_UPDATED_ROLE_SUCCESS =
+  "platform/role/SAVE_UPDATED_ROLE_SUCCESS";
+export const SAVE_UPDATED_ROLE_FAILURE =
+  "platform/role/SAVE_UPDATED_ROLE_FAILURE";
 
-export function updateRole(params) {
+export function saveEditedRole(params) {
   return async dispatch => {
     try {
       dispatch({
-        type: UPDATE_ROLE_REQUEST
+        type: SAVE_UPDATED_ROLE_REQUEST
       });
       const url = "/role/update";
       const res = await service({ url, method: "post", data: params });
       return dispatch({
-        type: UPDATE_ROLE_SUCCESS,
+        type: SAVE_UPDATED_ROLE_SUCCESS,
         payload: res
       });
     } catch (error) {
       return dispatch({
-        type: UPDATE_ROLE_FAILURE,
+        type: SAVE_UPDATED_ROLE_FAILURE,
         payload: error
       });
     }
@@ -54,14 +57,14 @@ export const DELETE_ROLE_REQUEST = "platform/role/DELETE_ROLE_REQUEST";
 export const DELETE_ROLE_SUCCESS = "platform/role/DELETE_ROLE_SUCCESS";
 export const DELETE_ROLE_FAILURE = "platform/role/DELETE_ROLE_FAILURE";
 
-export function deleteRole(params) {
+export function deleteRole(role) {
   return async dispatch => {
     try {
       dispatch({
         type: DELETE_ROLE_REQUEST
       });
       const url = "/role/delete";
-      const res = await service({ url, method: "post", data: params });
+      const res = await service({ url, method: "post", data: role });
       return dispatch({
         type: DELETE_ROLE_SUCCESS,
         payload: res
@@ -75,4 +78,19 @@ export function deleteRole(params) {
   };
 }
 
-export const SAVE_EDITED_ROLE = "platform/role/SAVE_EDITED_ROLE";
+export const CHANGE_ROLE_STATUS = "platform/role/CHANGE_ROLE_STATUS";
+export function changeRoleStatus(status, currentEditedRole) {
+  return {
+    type: CHANGE_ROLE_STATUS,
+    payload: { status, currentEditedRole }
+  };
+}
+
+export const CHANGE_CURRENT_EDITED_ROLE =
+  "platform/user/CHANGE_CURRENT_EDITED_ROLE";
+export function changeCurrentEditedRole(currentEditedRole) {
+  return {
+    type: CHANGE_CURRENT_EDITED_ROLE,
+    payload: currentEditedRole
+  };
+}

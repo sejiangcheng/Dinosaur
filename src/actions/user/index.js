@@ -25,7 +25,7 @@ export function getUsers() {
   };
 }
 
-export function getUsersByPageNumber(pageNumber) {
+export function getUsersByPageNumber(pageNumber, keyword) {
   //need new api to filter user
   return async dispatch => {
     try {
@@ -45,11 +45,6 @@ export function getUsersByPageNumber(pageNumber) {
       });
     }
   };
-}
-
-export const EDIT_USER = "platform/user/EDIT_USER";
-export function editUser(user) {
-  return { type: EDIT_USER, payload: user };
 }
 
 export const GET_USER_DATA_PERMISSION_REQUEST =
@@ -77,4 +72,38 @@ export function getUserDataPermission(user) {
       });
     }
   };
+}
+
+export async function sendEmail(userId) {
+  const url = `/user/password`;
+  try {
+    const res = await service({
+      url,
+      method: "post",
+      params: {
+        Id: userId,
+        Callback: location.href
+      }
+    });
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+export async function sendMessage(userId) {
+  const url = `/user/password/sms`;
+  try {
+    const res = await service({
+      url,
+      method: "post",
+      params: {
+        Id: userId,
+        Callback: location.href
+      }
+    });
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }

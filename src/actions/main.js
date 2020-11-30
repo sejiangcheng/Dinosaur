@@ -1,25 +1,10 @@
-export const Action = {
-  TEST_REQUEST: "main/TEST_REQUEST",
-  TEST_SUCCESS: "main/TEST_SUCCESS",
-  TEST_FAILURE: "main/TEST_FAILURE"
-};
-export function test() {
-  return async dispatch => {
-    try {
-      dispatch({
-        type: Action.TEST_REQUEST
-      });
-      // Doing request and get response.
-      const payload = {};
-      dispatch({
-        type: Action.TEST_SUCCESS,
-        payload
-      });
-    } catch (error) {
-      dispatch({
-        type: Action.TEST_FAILURE,
-        payload: error
-      });
-    }
-  };
+export const DISPLAY_SAVE_SUCESS_MESSAGE =
+  "platform/main/DISPLAY_SAVE_SUCESS_MESSAGE";
+export function showSaveSuccessMessage() {
+  return { type: DISPLAY_SAVE_SUCESS_MESSAGE };
+}
+export const SAVE_SUCCESS_MESSAGE_SHOWED =
+  "platform/main/SAVE_SUCCESS_MESSAGE_SHOWED";
+export function saveSuccessMessageShowed() {
+  return { type: SAVE_SUCCESS_MESSAGE_SHOWED };
 }

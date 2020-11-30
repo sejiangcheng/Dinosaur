@@ -10,8 +10,7 @@ const initialState = {
   error: null,
   loading: false,
   status: formStatus.VIEW,
-  needRefresh: true,
-  showSaveSuccessMessage: false
+  needRefresh: true
 };
 
 export default (state = initialState, action) => {
@@ -43,8 +42,7 @@ export default (state = initialState, action) => {
         currentEditedCustomer: null,
         loading: true, // the customer list will be refreshed, the loading status will be set false when customer list is reloaded
         status: formStatus.VIEW,
-        needRefresh: true,
-        showSaveSuccessMessage: true
+        needRefresh: true
       };
     }
     case editAction.CREATE_NEW_CUSTOMER_FAILURE: {
@@ -59,8 +57,7 @@ export default (state = initialState, action) => {
         currentEditedCustomer: null,
         loading: true,
         status: formStatus.VIEW,
-        needRefresh: true,
-        showSaveSuccessMessage: true
+        needRefresh: true
       };
     }
     case editAction.UPDATE_CUSTOMER_FAILURE: {
@@ -98,12 +95,6 @@ export default (state = initialState, action) => {
       return {
         ...state,
         currentEditedCustomer: { ...payload }
-      };
-    }
-    case editAction.SAVE_SUCCESS_MESSAGE_SHOWED: {
-      return {
-        ...state,
-        showSaveSuccessMessage: false
       };
     }
     default:

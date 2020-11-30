@@ -4,31 +4,34 @@ import { changeCurrentEditedUser } from "@/actions/user/edit";
 import InputFormItem from "@/shared/components/form/form-item/InputFormItem";
 import SelectFormItem from "@/shared/components/form/form-item/SelectFormItem";
 import RadioFormItem from "@/shared/components/form/form-item/RadioFormItem";
-import { getRoles } from "@/actions/role/index";
+import RolePrivilegeView from "@/components/role/RolePrivilegeView";
+import { Select, Drawer } from "antd";
+const { Option } = Select;
 
 export default function UserBasicInfoEditForm(props) {
   const { form } = props;
   const dispatch = useDispatch();
+  const [displayChildDrawer, setDisplayChildDrawer] = useState(false);
+  const [currentViewedRole, setCurrentViewedRole] = useState(null);
   const { currentEditedUser } = useSelector(state => state.platform.user);
-  const user = useSelector(state => state.main.currentUser);
-
   const { roles } = useSelector(state => state.platform.role);
   const changeUserAttr = (attr, value) => {
     currentEditedUser[attr] = value;
-    dispatch(changeCurrentEditedUser());
+    dispatch(changeCurrentEditedUser(currentEditedUser));
+  };
+  const showPermissionDrawer = role => {
+    setCurrentViewedRole(role);
+    setDisplayChildDrawer(true);
   };
   useEffect(() => {
-    if (!roles) {
-      const { CustomerId } = user;
-      dispatch(getRoles(CustomerId));
-    }
-  }, []);
+    props.onChildDrawerVisibleChange(displayChildDrawer);
+  }, [displayChildDrawer]);
   return (
     <>
       <InputFormItem
         form={form}
         label="用户名称"
-        code="CustomerName"
+        code="Name"
         item={currentEditedUser}
         onChange={changeUserAttr}
         isRequired={true}
@@ -36,12 +39,40 @@ export default function UserBasicInfoEditForm(props) {
       <SelectFormItem
         form={form}
         label="角色"
-        code="Role"
+        code="UserType"
         item={currentEditedUser}
+        optionLabelProp="label"
         options={
           roles &&
           roles.map(role => {
             return { value: role.Id, label: role.Name };
+          })
+        }
+        renderOptions={
+          roles &&
+          roles.map(role => {
+            return (
+              <Option value={role.Id} label={role.Name}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "0 5px"
+                  }}
+                >
+                  <span> {role.Name} </span>
+                  <span
+                    className="check-role"
+                    onClick={e => {
+                      e.stopPropagation();
+                      showPermissionDrawer(role);
+                    }}
+                  >
+                    查看
+                  </span>
+                </div>
+              </Option>
+            );
           })
         }
         onChange={changeUserAttr}
@@ -50,7 +81,7 @@ export default function UserBasicInfoEditForm(props) {
       <RadioFormItem
         form={form}
         label="账号激活方式"
-        code="UserType"
+        code="ActiveMethod"
         item={currentEditedUser}
         onChange={changeUserAttr}
         isRequired={true}
@@ -85,13 +116,24 @@ export default function UserBasicInfoEditForm(props) {
             备注<span className="weak-title">（选填）</span>
           </span>
         }
-        code="Description"
+        code="Comment"
         form={form}
         item={currentEditedUser}
         onChange={changeUserAttr}
         isRequired={false}
         isTextArea={true}
       />
+      <Drawer
+        title={currentViewedRole && currentViewedRole.Name}
+        className={"role-privilege-view-drawer"}
+        visible={displayChildDrawer}
+        destroyOnClose
+        onClose={() => {
+          setDisplayChildDrawer(false);
+        }}
+      >
+        <RolePrivilegeView roleId={currentViewedRole && currentViewedRole.Id} />
+      </Drawer>
     </>
   );
 }

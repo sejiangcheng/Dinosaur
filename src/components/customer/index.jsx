@@ -7,8 +7,7 @@ import {
   saveNewCustomer,
   saveEditedCustomer,
   closeEditStatus,
-  deleteCustomer,
-  saveSuccessMessageShowed
+  deleteCustomer
 } from "@/actions/customer/edit";
 import PlatformPage from "../platformPage";
 import { Divider, Drawer, Button, Form, Modal, Icon } from "antd";
@@ -21,8 +20,21 @@ const getColumns = (onEdit, onDelete) => {
   return [
     {
       title: "LOGO",
-      dataIndex: "LOGO",
-      key: "LOGO"
+      dataIndex: "Logo",
+      key: "Logo",
+      width: "200px",
+      render: (text, record, index) => {
+        return (
+          <div className="image-wrapper">
+            <div
+              className="logo-image"
+              style={{
+                background: `url(${record.Logo}) no-repeat center/100%`
+              }}
+            />
+          </div>
+        );
+      }
     },
     {
       title: "客户名称",
@@ -127,7 +139,6 @@ function Customer(props) {
     },
     platformType: "客户",
     getListByPageNumber: getCustomersByPageNumber,
-    saveSuccessMessageShowed,
     searchName: "CustomerName",
     searchPlaceholder: "请搜索客户名称",
     columns: getColumns(onEditCustomer, onDeleteCustomer),
@@ -151,7 +162,7 @@ function Customer(props) {
             <div className="drawer-form-items">
               <CustomerEditForm form={props.form} />
             </div>
-            <div className="flex-end-layout">
+            <div className="drawer-footer">
               <Button onClick={onClose} style={{ marginRight: 8 }}>
                 取消
               </Button>

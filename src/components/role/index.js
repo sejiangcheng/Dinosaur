@@ -1,54 +1,98 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getRoles, getRolesByPageNumber } from "@/actions/role";
-import { Button, AutoComplete, Input, Icon, Table, Divider, Spin } from "antd";
+import { getRoles } from "@/actions/role";
+import { Button, Drawer, Table, Divider, Spin } from "antd";
+import {
+  changeRoleStatus,
+  deleteRole,
+  saveNewRole,
+  saveEditedRole
+} from "@/actions/role/edit";
 import _ from "lodash";
-import { withRouter } from "react-router";
 import "./style.less";
-const defaultPageSize = 10;
-const columns = [
-  {
-    title: "角色名称",
-    dataIndex: "Name",
-    key: "Name"
-  },
-  {
-    title: "功能模块",
-    dataIndex: "PrivilegeCodes",
-    key: "PrivilegeCodes"
-  },
-  {
-    title: "更新",
-    dataIndex: "Telephone",
-    key: "Telephone"
-  },
-  {
-    title: "操作",
-    dataIndex: "Operations",
-    key: "Operations",
-    render: () => {
-      return (
-        <div className="flex-start-layout">
-          <a>编辑</a>
-          <Divider type="vertical" />
-          <a>删除</a>
-        </div>
-      );
-    }
-  }
-];
+import { formStatus } from "@/constants/formStatus";
+import RoleDrawerContent from "./RoleDrawerContent";
 
-function Role(props) {
+const getColumns = (onEdit, onDelete) => {
+  return [
+    {
+      title: "角色名称",
+      dataIndex: "Name",
+      key: "Name"
+    },
+    {
+      title: "功能模块",
+      dataIndex: "PackageNames",
+      key: "PackageNames"
+    },
+    {
+      title: "更新",
+      dataIndex: "Telephone",
+      key: "Telephone"
+    },
+    {
+      title: "操作",
+      dataIndex: "Operations",
+      key: "Operations",
+      render: (record, index) => {
+        return (
+          <div className="flex-start-layout">
+            <a
+              onClick={() => {
+                onEdit(record);
+              }}
+            >
+              编辑
+            </a>
+            <Divider type="vertical" />
+            <a
+              onClick={() => {
+                onDelete(record);
+              }}
+            >
+              删除
+            </a>
+          </div>
+        );
+      }
+    }
+  ];
+};
+
+export default function Role(props) {
   const dispatch = useDispatch();
-  const loading = useSelector(state => state.platform.role.loading);
-  const roles = useSelector(state => state.platform.role.roles);
-  const roleNames = roles && roles.map(role => role.Name);
-  const filterRoleName = roleName => {
-    return null;
-  };
+  const {
+    loading,
+    roles,
+    status,
+    needRefresh,
+    currentEditedRole
+  } = useSelector(state => state.platform.role);
   useEffect(() => {
-    dispatch(getRolesByPageNumber(1));
-  }, [dispatch]);
+    if (needRefresh) {
+      dispatch(getRoles());
+    }
+  }, [needRefresh]);
+  const createRole = () => {
+    dispatch(changeRoleStatus(formStatus.ADD));
+  };
+  const onEditRole = role => {
+    dispatch(changeRoleStatus(formStatus.ADD, role));
+  };
+  const onDeleteRole = role => {
+    dispatch(deleteRole(role));
+  };
+  const onClose = () => {
+    dispatch(changeRoleStatus(formStatus.VIEW));
+  };
+  const onSave = () => {
+    if (status === formStatus.ADD) {
+      dispatch(saveNewRole(currentEditedRole));
+    } else {
+      dispatch(saveEditedRole(currentEditedRole));
+    }
+  };
+  const columns = getColumns(onEditRole, onDeleteRole);
   return loading ? (
     <div className="flex-center-wrapper-layout">
       <Spin size="large" />
@@ -56,49 +100,32 @@ function Role(props) {
   ) : (
     <div className="platform-manage">
       <div className="flex-start-layout">
-        <Button icon="plus" className="platform-add-button">
+        <Button
+          icon="plus"
+          type="primary"
+          onClick={createRole}
+          className="platform-add-button"
+        >
           角色
         </Button>
-        <AutoComplete
-          style={{
-            width: 200
-          }}
-          options={roleNames}
-          filterOption={(inputValue, option) =>
-            option.value.startsWith(inputValue)
-          }
-          onSelect={filterRoleName}
-        >
-          <Input prefix={<Icon type="search" />} placeholder="请搜索角色名称" />
-        </AutoComplete>
       </div>
-      <RoleTable />
+      <div className="platform-table-wrapper">
+        <Table
+          columns={columns}
+          dataSource={roles}
+          pagination={false}
+          size="middle"
+        />
+      </div>
+      <Drawer
+        className="role-edit-drawer"
+        visible={status !== formStatus.VIEW}
+        destroyOnClose={true}
+        onClose={onClose}
+        title={`${status === formStatus.ADD ? "新建" : "编辑"}角色`}
+      >
+        <RoleDrawerContent onClose={onClose} onSave={onSave} />
+      </Drawer>
     </div>
   );
 }
-
-function RoleTable(props) {
-  const dispatch = useDispatch();
-  const roles = useSelector(state => state.platform.role.roles);
-  const [currentPage, setCurrentPage] = useState(1);
-  const changePageNumber = (page, pageSize) => {
-    getRolesByPageNumber(page);
-    setCurrentPage(page);
-  };
-
-  return (
-    <div className="platform-table-wrapper">
-      <Table
-        columns={columns}
-        dataSource={roles}
-        pagination={{
-          current: currentPage,
-          onChange: changePageNumber,
-          pageSize: defaultPageSize,
-          total: roles && roles.length
-        }}
-      />
-    </div>
-  );
-}
-export default withRouter(Role);

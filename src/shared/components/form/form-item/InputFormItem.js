@@ -10,6 +10,7 @@ export default function InputFormItem(props) {
       component={
         isTextArea ? (
           <TextArea
+            style={props.style}
             onChange={e => {
               onChange(code, e.target.value);
             }}
@@ -18,6 +19,7 @@ export default function InputFormItem(props) {
           />
         ) : (
           <Input
+            style={props.style}
             placeholder={"请输入"}
             onChange={e => {
               onChange(code, e.target.value);

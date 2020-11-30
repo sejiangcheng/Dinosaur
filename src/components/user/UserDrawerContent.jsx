@@ -12,16 +12,13 @@ import {
 import { getUserDataPermission } from "@/actions/user";
 
 export default function UserDrawerContent(props) {
-  const dispatch = useDispatch();
-  const { status, currentEditedUser } = useSelector(
-    state => state.platform.user
-  );
+  const { status } = useSelector(state => state.platform.user);
   if (status === formStatus.ADD) {
     return <UserEditAddWithForm {...props} />;
   } else if (status === formStatus.EDIT_BASIC_INFO) {
     return <UserEditUpdateBasicInfoWithForm {...props} />;
   } else if (status === formStatus.EDIT_DATA_PERMISSION) {
-    return <UserEditUpdateDataPermission {...props} />;
+    return <UserEditUpdateDataPermissionWrapper {...props} />;
   } else if (status === formStatus.VIEW_DATA_PERMISSION) {
     return <UserViewDataPermission {...props} />;
   }
@@ -42,9 +39,12 @@ function UserEditAdd(props) {
       <Form layout={"vertical"} hideRequiredMark colon={false}>
         <div className="flex-full-height">
           <div className="flex-full-height">
-            <UserEditBasicInfoForm form={props.form} />
+            <UserEditBasicInfoForm
+              form={props.form}
+              onChildDrawerVisibleChange={props.onChildDrawerVisibleChange}
+            />
           </div>
-          <div className="flex-end-layout">
+          <div className="drawer-footer">
             <Button onClick={props.onClose} style={{ marginRight: 8 }}>
               取消
             </Button>
@@ -63,8 +63,10 @@ function UserEditAdd(props) {
   } else {
     return (
       <div className="flex-full-height">
-        <UserDataPermissionEdit />
-        <div className="flex-end-layout">
+        <div className="flex-full-height">
+          <UserEditUpdateDataPermission />
+        </div>
+        <div className="drawer-footer">
           <Button onClick={props.onClose} style={{ marginRight: 8 }}>
             取消
           </Button>
@@ -108,9 +110,12 @@ function UserEditUpdateBasicInfo(props) {
     <Form layout={"vertical"} hideRequiredMark colon={false}>
       <div className="flex-full-height">
         <div className="flex-full-height">
-          <UserEditBasicInfoForm form={props.form} />
+          <UserEditBasicInfoForm
+            form={props.form}
+            onChildDrawerVisibleChange={props.onChildDrawerVisibleChange}
+          />
         </div>{" "}
-        <div className="flex-end-layout">
+        <div className="drawer-footer">
           <Button onClick={props.onClose} style={{ marginRight: 8 }}>
             取消
           </Button>
@@ -127,45 +132,11 @@ const UserEditUpdateBasicInfoWithForm = Form.create({
   name: "edit-basic-info"
 })(UserEditUpdateBasicInfo);
 
-function UserEditUpdateDataPermission(props) {
-  const dispatch = useDispatch();
-  const {
-    currentEditedUser,
-    loadingDataPermission,
-    currentUserHasAllDataPermission
-  } = useSelector(state => state.platform.user);
-
-  useEffect(() => {
-    dispatch(getUserDataPermission(currentEditedUser));
-  }, []);
-
+function UserEditUpdateDataPermissionWrapper(props) {
   return (
     <div className="flex-full-height">
-      <div className="flex-full-height">
-        {loadingDataPermission ? (
-          <div className="flex-center-wrapper-layout">
-            <Spin size="large" />
-          </div>
-        ) : (
-          <>
-            <Form layout={"vertical"} hideRequiredMark colon={false}>
-              <Form.Item label="数据权限">
-                <Radio.Group
-                  value={currentUserHasAllDataPermission}
-                  onChange={e => {
-                    dispatch(changeUserHasAllDataPermission(e.target.value));
-                  }}
-                >
-                  <Radio value={false}>自定义</Radio>
-                  <Radio value={true}>全部</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Form>
-            {!currentUserHasAllDataPermission && <UserDataPermissionEdit />}
-          </>
-        )}
-      </div>
-      <div className="flex-end-layout">
+      <UserEditUpdateDataPermission />
+      <div className="drawer-footer">
         <Button onClick={props.onClose} style={{ marginRight: 8 }}>
           取消
         </Button>
@@ -178,6 +149,49 @@ function UserEditUpdateDataPermission(props) {
           保存
         </Button>
       </div>
+    </div>
+  );
+}
+
+function UserEditUpdateDataPermission(props) {
+  const dispatch = useDispatch();
+  const {
+    currentEditedUser,
+    loadingDataPermission,
+    currentUserHasAllDataPermission,
+    currentUserDataPermission
+  } = useSelector(state => state.platform.user);
+
+  useEffect(() => {
+    if (!currentUserDataPermission) {
+      dispatch(getUserDataPermission(currentEditedUser));
+    }
+  }, []);
+
+  return (
+    <div className="flex-full-height">
+      {loadingDataPermission ? (
+        <div className="flex-center-wrapper-layout">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <Form layout={"vertical"} hideRequiredMark colon={false}>
+            <Form.Item label="数据权限">
+              <Radio.Group
+                value={currentUserHasAllDataPermission}
+                onChange={e => {
+                  dispatch(changeUserHasAllDataPermission(e.target.value));
+                }}
+              >
+                <Radio value={false}>自定义</Radio>
+                <Radio value={true}>全部</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Form>
+          {!currentUserHasAllDataPermission && <UserDataPermissionEdit />}
+        </>
+      )}
     </div>
   );
 }
@@ -208,7 +222,7 @@ function UserViewDataPermission(props) {
           <UserDataPermissionView />
         )}
       </div>
-      <div className="flex-end-layout">
+      <div className="drawer-footer">
         <Button onClick={onEdit} type="primary">
           编辑
         </Button>

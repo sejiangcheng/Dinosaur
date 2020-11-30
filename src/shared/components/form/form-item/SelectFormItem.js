@@ -4,7 +4,7 @@ import CommonFormItem from "./CommonFormItem";
 const { Option } = Select;
 
 export default function SelectFormItem(props) {
-  const { code, onChange, options } = props;
+  const { code, onChange, options, renderOptions, optionLabelProp } = props;
   return (
     <CommonFormItem
       {...props}
@@ -14,11 +14,13 @@ export default function SelectFormItem(props) {
           onChange={val => {
             onChange(code, val);
           }}
+          optionLabelProp={optionLabelProp}
         >
-          {options &&
-            options.map(option => {
-              return <Option value={option.value}>{option.label}</Option>;
-            })}
+          {renderOptions ||
+            (options &&
+              options.map(option => {
+                return <Option value={option.value}>{option.label}</Option>;
+              }))}
         </Select>
       }
     />

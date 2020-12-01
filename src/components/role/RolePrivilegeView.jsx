@@ -4,7 +4,19 @@ import { Table, Spin } from "antd";
 import { getRolePrivileges } from "@/actions/role";
 
 const columns = [
-  { title: "PackageName", dataIndex: "PackageName", key: "PackageName" }
+  {
+    title: "PackageName",
+    dataIndex: "PackageName",
+    key: "PackageName",
+    render: (text, record, index) => {
+      return (
+        <div className="highlighted-bar-wrapper">
+          <span className="highlighted-bar"></span>
+          {text}
+        </div>
+      );
+    }
+  }
 ];
 
 export default function RolePrivilegeView(props) {
@@ -23,7 +35,7 @@ export default function RolePrivilegeView(props) {
     ];
     return (
       <Table
-        rowClassName="action-row"
+        rowClassName="feature-row"
         columns={columns}
         dataSource={record.Features}
         pagination={false}
@@ -39,7 +51,7 @@ export default function RolePrivilegeView(props) {
       expandIcon={() => {
         return null;
       }}
-      rowClassName="feature-row"
+      rowClassName="package-row"
       expandedRowRender={expandedRowRender}
       defaultExpandAllRows={true}
       dataSource={packages}

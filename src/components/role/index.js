@@ -18,22 +18,26 @@ const getColumns = (onEdit, onDelete) => {
     {
       title: "角色名称",
       dataIndex: "Name",
-      key: "Name"
+      key: "Name",
+      width: "18%"
     },
     {
       title: "功能模块",
       dataIndex: "PackageNames",
-      key: "PackageNames"
+      key: "PackageNames",
+      width: "44%"
     },
     {
       title: "更新",
       dataIndex: "Telephone",
-      key: "Telephone"
+      key: "Telephone",
+      width: "26%"
     },
     {
       title: "操作",
       dataIndex: "Operations",
       key: "Operations",
+      width: "12%",
       render: (record, index) => {
         return (
           <div className="flex-start-layout">

@@ -71,10 +71,10 @@ export default function CustomTree(props) {
     );
   };
   const selectAll = node => {
-    const checkedKeys = node.hasSelectAll
+    const newCheckedKeys = node.hasSelectAll
       ? _.difference(checkedKeys, node.childrenIds)
       : _.union(checkedKeys, node.childrenIds);
-    onCheck(checkedKeys);
+    onCheck(newCheckedKeys);
   };
   const onCheck = keys => {
     const checkedKeys = keys;

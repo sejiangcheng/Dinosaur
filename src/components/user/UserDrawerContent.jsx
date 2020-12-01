@@ -4,7 +4,7 @@ import { formStatus } from "@/constants/formStatus";
 import UserEditBasicInfoForm from "./UserEditBasicInfoForm";
 import UserDataPermissionEdit from "./UserDataPermissionEdit";
 import UserDataPermissionView from "./UserDataPermissionView";
-import { Form, Button, Tree, Spin, Icon, Radio } from "antd";
+import { Form, Button, Tree, Spin, Icon, Radio, Tooltip } from "antd";
 import {
   changeUserStatus,
   changeUserHasAllDataPermission
@@ -185,7 +185,18 @@ function UserEditUpdateDataPermission(props) {
                 }}
               >
                 <Radio value={false}>自定义</Radio>
-                <Radio value={true}>全部</Radio>
+                <Radio value={true}>
+                  全部
+                  <Tooltip
+                    title={"无论层级节点如何变化，自动获取全部层级节点权限"}
+                  >
+                    <Icon
+                      type="question-circle"
+                      theme="filled"
+                      style={{ marginLeft: 5 }}
+                    />
+                  </Tooltip>
+                </Radio>
               </Radio.Group>
             </Form.Item>
           </Form>

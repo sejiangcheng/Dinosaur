@@ -148,6 +148,11 @@ export default (state = initialState, action) => {
         currentEditedRole: currentEditedRole || {}
       };
     }
+    case actionType.ROLE_HAS_BEEN_USED_SUCCESS: {
+      const isUsed = payload;
+      const { currentEditedRole } = state;
+      return { ...state, currentEditedRole: { ...currentEditedRole, isUsed } };
+    }
     default:
       return state;
   }

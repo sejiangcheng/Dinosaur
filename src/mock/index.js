@@ -64,6 +64,11 @@ Mock.mock(/role\/.*\/roleprivileges/, "get", {
   ]
 });
 
+Mock.mock(/role\/.*\/isused/, "get", {
+  Error: "0",
+  Message: [""],
+  Result: true
+});
 Mock.mock(/role\/allroleprivileges/, "get", {
   Error: "0",
   Message: [""],

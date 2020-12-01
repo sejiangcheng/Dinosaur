@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import moment from "moment";
 import { getCustomersByPageNumber } from "@/actions/customer";
 import {
   editCustomer,
@@ -53,8 +54,11 @@ const getColumns = (onEdit, onDelete) => {
     },
     {
       title: "创建时间",
-      dataIndex: "CreateTime",
-      key: "CreateTime"
+      dataIndex: "StartTime",
+      key: "StartTime",
+      render: (text, record, index) => {
+        return moment(text).format("YYYY年MM月DD日");
+      }
     },
     {
       title: "操作",

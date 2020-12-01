@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getRoles } from "@/actions/role";
-import { Button, Drawer, Table, Divider, Spin } from "antd";
+import { Button, Drawer, Table, Divider, Spin, Icon, Modal } from "antd";
 import {
   changeRoleStatus,
   deleteRole,
@@ -38,7 +38,7 @@ const getColumns = (onEdit, onDelete) => {
       dataIndex: "Operations",
       key: "Operations",
       width: "12%",
-      render: (record, index) => {
+      render: (text, record, index) => {
         return (
           <div className="flex-start-layout">
             <a
@@ -81,10 +81,19 @@ export default function Role(props) {
     dispatch(changeRoleStatus(formStatus.ADD));
   };
   const onEditRole = role => {
-    dispatch(changeRoleStatus(formStatus.ADD, role));
+    dispatch(changeRoleStatus(formStatus.EDIT, role));
   };
   const onDeleteRole = role => {
-    dispatch(deleteRole(role));
+    Modal.confirm({
+      content: `确认删除当前角色【${role.Name}】？`,
+      okText: "删除",
+      centered: true,
+      icon: <Icon type="info-circle" theme="filled" />,
+      onOk: () => {
+        dispatch(deleteRole(role));
+      },
+      okType: "danger"
+    });
   };
   const onClose = () => {
     dispatch(changeRoleStatus(formStatus.VIEW));

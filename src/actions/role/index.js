@@ -87,3 +87,30 @@ export function getAvailablePrivileges(partnerId) {
     }
   };
 }
+
+export const ROLE_HAS_BEEN_USED_REQUEST = "platform/role/ROLE_HAS_BEEN_USED";
+export const ROLE_HAS_BEEN_USED_SUCCESS =
+  "platform/role/ROLE_HAS_BEEN_USED_SUCCESS";
+export const ROLE_HAS_BEEN_USED_FAILURE =
+  "platform/role/ROLE_HAS_BEEN_USED_FAILURE";
+
+export function roleHasBeenUsed(roleId) {
+  return async dispatch => {
+    try {
+      dispatch({
+        type: ROLE_HAS_BEEN_USED_REQUEST
+      });
+      const url = `/role/${roleId}/isused`;
+      const res = await service({ url, method: "get" });
+      return dispatch({
+        type: ROLE_HAS_BEEN_USED_SUCCESS,
+        payload: res
+      });
+    } catch (error) {
+      return dispatch({
+        type: ROLE_HAS_BEEN_USED_FAILURE,
+        payload: error
+      });
+    }
+  };
+}

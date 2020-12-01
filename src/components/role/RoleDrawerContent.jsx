@@ -179,14 +179,14 @@ function RoleDrawerContent(props) {
             </Tabs>
           )}
         </div>
-        <div className="drawer-footer">
-          <Button onClick={props.onClose} style={{ marginRight: 8 }}>
-            取消
-          </Button>
-          <Button onClick={onSave} type="primary">
-            保存
-          </Button>
-        </div>
+      </div>
+      <div className="role-drawer-footer">
+        <Button onClick={props.onClose} style={{ marginRight: 8 }}>
+          取消
+        </Button>
+        <Button onClick={onSave} type="primary">
+          保存
+        </Button>
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getRoles } from "@/actions/role";
-import { Button, Drawer, Table, Divider, Spin, Icon, Modal } from "antd";
+import { Button, Drawer, Divider, Spin, Icon, Modal } from "antd";
 import {
   changeRoleStatus,
   deleteRole,
@@ -11,6 +11,7 @@ import {
 import _ from "lodash";
 import "./style.less";
 import { formStatus } from "@/constants/formStatus";
+import Table from "@/shared/components/table-with-pagination";
 import RoleDrawerContent from "./RoleDrawerContent";
 
 const getColumns = (onEdit, onDelete) => {

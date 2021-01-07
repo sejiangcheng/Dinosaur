@@ -141,7 +141,7 @@ export default (state = initialState, action) => {
       };
     }
     case editAction.CHANGE_ROLE_STATUS: {
-      const { status, currentEditedRole } = payload;
+      const { status, currentEditedRole, currentRolePrivileges } = payload;
       return {
         ...state,
         status,

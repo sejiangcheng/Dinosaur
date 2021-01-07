@@ -51,7 +51,9 @@ function RoleDrawerContent(props) {
       dispatch(getRolePrivileges(currentEditedRole.Id));
       dispatch(roleHasBeenUsed(currentEditedRole.Id));
     }
-    dispatch(getAvailablePrivileges(partnerId));
+    if (!currentAvailablePrivileges) {
+      dispatch(getAvailablePrivileges(partnerId));
+    }
   }, []);
   useEffect(() => {
     if (currentAvailablePrivileges) {

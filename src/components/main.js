@@ -11,15 +11,10 @@ function Platform(props) {
   return (
     <div className="platform-wrapper">
       <Switch>
-        <Route
-          path={[
-            `${basePath}/customer/:customerId/:status?`,
-            `${basePath}/customer`
-          ]}
-          component={Customer}
-        />
-        <Route path={[`${basePath}/user/manage/:userId?`]} component={User} />
-        <Route path={`${basePath}/user/role/:roleId?`} component={Role} />
+        <Route path={`${basePath}/customer`} component={Customer} />
+        <Route path={[`${basePath}/user`]} component={User} />
+        <Route path={`${basePath}/role`} component={Role} />
+        <Redirect to={`${basePath}/customer`} from={basePath} exact />
       </Switch>
     </div>
   );
